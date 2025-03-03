@@ -1,27 +1,43 @@
 aid: john-deere
-name: John Deere
-description: 'Apply a world of data and efficient APIs to reshape the industry. '
-type: Index
-position: Consumer
-access: 3rd-Party
-image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
-tags:
-  - API
-created: '2025-02-12'
-modified: '2025-02-12'
 url: >-
   https://raw.githubusercontent.com/api-evangelist/john-deere/refs/heads/main/apis.yml
-specificationVersion: '0.19'
 apis:
   - aid: john-deere:john-deere
     name: John Deere
-    description: 'Apply a world of data and efficient APIs to reshape the industry. '
-    humanURL: ' https://developer.deere.com/'
     tags:
       - API
+    humanURL: ' https://developer.deere.com/'
     properties:
-      - type: Documentation
-        url: ' https://developer.deere.com/'
+      - url: ' https://developer.deere.com/'
+        type: Documentation
+    description: 'Apply a world of data and efficient APIs to reshape the industry. '
+name: John Deere
+tags:
+  - Agriculture
+  - Construction
+  - Forestry
+  - Tractors
+  - Machinery
+  - Excavators
+  - Combines
+type: Index
+image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+access: 3rd-Party
+created: '2025-02-12'
+modified: '2025-03-02'
+position: Consumer
+description: >-
+  John Deere is a renowned American corporation that specializes in
+  manufacturing agricultural, construction, and forestry machinery. The company,
+  founded in 1837 by John Deere, has a long history of innovation and has become
+  a leader in the industry. John Deere's products include tractors, combines,
+  excavators, and other equipment designed to support and improve farming and
+  construction operations. The company is committed to providing high-quality,
+  reliable machinery that helps customers increase productivity and efficiency
+  in their work. With a strong focus on sustainability and technology, John
+  Deere continues to advance and adapt its products to meet the evolving needs
+  of its customers.
 maintainers:
   - FN: Kin Lane
     email: info@apievangelist.com
+specificationVersion: '0.19'
