@@ -3,7 +3,7 @@ url: >-
   https://raw.githubusercontent.com/api-evangelist/john-deere/refs/heads/main/apis.yml
 apis:
   - aid: john-deere:john-deere
-    name: John Deere
+    name: John Deere API
     tags:
       - API
     humanURL: ' https://developer.deere.com/'
