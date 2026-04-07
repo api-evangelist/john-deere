@@ -6,12 +6,12 @@ apis:
     name: John Deere API
     tags:
       - Agriculture
-      - Construction
-      - Forestry
-      - Tractors
-      - Machinery
-      - Excavators
       - Combines
+      - Construction
+      - Excavators
+      - Forestry
+      - Machinery
+      - Tractors
     humanURL: ' https://developer.deere.com/'
     properties:
       - url: ' https://developer.deere.com/'
@@ -24,12 +24,12 @@ apis:
 name: John Deere
 tags:
   - Agriculture
-  - Construction
-  - Forestry
-  - Tractors
-  - Machinery
-  - Excavators
   - Combines
+  - Construction
+  - Excavators
+  - Forestry
+  - Machinery
+  - Tractors
 type: Index
 image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
 access: 3rd-Party
