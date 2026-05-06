@@ -1,5 +1,6 @@
 specification: FinOps Framework
 specificationVersion: '1.0'
+schema: https://www.finops.org/framework/
 alignedWith:
   framework: FinOps Foundation Framework
   frameworkUrl: https://www.finops.org/framework/
@@ -8,131 +9,74 @@ alignedWith:
   dataSpecUrl: https://focus.finops.org/focus-specification/v1-3/
 provider: John Deere
 providerId: john-deere
-publisherName: John Deere
-serviceCategory: API
+publisherName: Deere & Company
+serviceCategory: Agriculture / Equipment Telemetry
 created: '2026-05-04'
-modified: '2026-05-04'
+modified: '2026-05-05'
+reconciled: false
+notes: John Deere does not publish public pricing or a usage/billing API for its developer
+  program. FinOps shape is inferred from the partner-program model (negotiated contract).
+  Meters listed are placeholders aligned to the kinds of usage the Operations Center API
+  exposes (machine telemetry events, field operation files, equipment inventory reads).
 tags:
   - Agriculture
-  - Combines
-  - Construction
-  - Excavators
-  - Forestry
+  - Equipment
   - Machinery
-  - Tractors
   - FinOps
-  - Cost Management
   - FOCUS
-description: FinOps framework definition for the John Deere API surface. Provides a FOCUS-aligned mapping
-  for cost allocation, usage measurement, and unit-economics reporting across the provider's APIs.
-principles:
-  - name: Visibility
-    description: Make API consumption costs visible to engineering, product, and finance teams in near
-      real-time.
-  - name: Allocation
-    description: Tag every chargeable API call with the consuming team, environment, application, and
-      feature so cost can be allocated.
-  - name: Optimization
-    description: Continuously evaluate request patterns, caching, batching, and tier selection to reduce
-      cost per useful unit of work.
-  - name: Accountability
-    description: Establish budget owners and chargeback or showback flows for each consuming team.
-domains:
-  - name: Understand Usage and Cost
-    capabilities:
-      - Data Ingestion
-      - Allocation
-      - Reporting and Analytics
-      - Anomaly Management
-  - name: Quantify Business Value
-    capabilities:
-      - Planning and Estimating
-      - Forecasting
-      - Budgeting
-      - Benchmarking
-      - Unit Economics
-  - name: Optimize Usage and Cost
-    capabilities:
-      - Architecting for Cloud
-      - Rate Optimization
-      - Workload Optimization
-      - Cloud Sustainability
-      - Licensing and SaaS
-  - name: Manage the FinOps Practice
-    capabilities:
-      - FinOps Practice Operations
-      - FinOps Education and Enablement
-      - Invoicing and Chargeback
-      - Onboarding Workloads
-      - Intersecting Disciplines
+description: FOCUS-aligned FinOps scaffold for the John Deere developer program. Treated as
+  a negotiated-enterprise relationship; no public usage-billing telemetry is exposed.
+sources:
+  - https://developer.deere.com/
+  - https://www.finops.org/framework/
+  - https://focus.finops.org/focus-specification/v1-3/
 billingModel:
-  pricingCategory: Usage-Based
-  billingFrequency: Monthly
+  pricingCategory: Enterprise / Negotiated
+  billingFrequency: Per-Contract
   billingCurrency: USD
   chargeCategories:
-    - Usage
     - Purchase
-    - Tax
-    - Credit
     - Adjustment
-  chargeFrequency: Recurring
 focusColumns:
-  ServiceName: John Deere
-  ServiceCategory: Developer Tools / API
+  ServiceName: John Deere Developer APIs
+  ServiceCategory: Agriculture / Equipment Telemetry
   ProviderName: John Deere
-  PublisherName: John Deere
-  InvoiceIssuerName: John Deere
-  PricingCategory: Usage-Based
-  PricingUnit: request
+  PublisherName: Deere & Company
+  InvoiceIssuerName: Deere & Company
   BillingCurrency: USD
-  ChargeCategory: Usage
 meters:
   - name: api_requests
-    description: Count of billable API requests
     unit: request
     aggregation: sum
     dimensions:
+      - application
       - api
-      - endpoint
-      - tier
-      - region
-      - consumer
-  - name: data_egress
-    description: Bytes returned over the network in API responses
-    unit: GB
+      - organization
+  - name: machine_telemetry_events
+    unit: event
     aggregation: sum
     dimensions:
-      - api
-      - region
-      - consumer
-  - name: compute_seconds
-    description: Server-side compute consumed by the request, where applicable
-    unit: second
-    aggregation: sum
+      - organization
+      - machine
+  - name: file_transfers
+    unit: file
+    aggregation: count
     dimensions:
-      - api
-      - endpoint
-      - tier
-apis:
-  - name: John Deere API
-    baseURL: ''
-    tags:
-      - Agriculture
-      - Combines
-      - Construction
-      - Excavators
-      - Forestry
-      - Machinery
-      - Tractors
-    serviceName: John Deere API
-    serviceCategory: API
-unitEconomics:
-  - name: Cost per 1K Requests
-    metric: billed_cost / (api_requests / 1000)
-    target: TBD
-  - name: Cost per Active Consumer
-    metric: billed_cost / active_consumers
-    target: TBD
+      - organization
+      - operation
+principles:
+  - name: Visibility
+    description: Track per-application API call volume against the limits provisioned during
+      developer-program onboarding; there is no first-party usage-billing API to ingest.
+  - name: Allocation
+    description: Allocate usage by application_id and organization (dealer / customer account)
+      since John Deere scopes API access by partner application and authorized organization.
+  - name: Optimization
+    description: Reduce machine-telemetry polling cost by subscribing to Operations Center
+      webhooks where available and caching equipment / field metadata that changes infrequently.
+  - name: Accountability
+    description: A named partner-program contact at John Deere is the escalation path for
+      limit raises and contract review; pair with an internal API-product owner.
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com

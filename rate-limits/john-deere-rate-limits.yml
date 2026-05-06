@@ -4,88 +4,37 @@ schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main
 provider: John Deere
 providerId: john-deere
 created: '2026-05-04'
-modified: '2026-05-04'
+modified: '2026-05-05'
+reconciled: false
+notes: John Deere does not publish numeric rate limits for the Operations Center / MyJohnDeere
+  developer APIs. Limits are applied per partner application and communicated during onboarding.
+  Reconciliation blocked pending public rate-limit documentation or partner-program technical
+  guidelines.
 tags:
   - Agriculture
-  - Combines
-  - Construction
-  - Excavators
-  - Forestry
+  - Equipment
   - Machinery
-  - Tractors
   - Rate Limiting
-  - Quotas
-  - Throttling
-description: Machine-readable rate limit definitions for the John Deere API surface. Captures per-tier
-  quotas, burst behavior, response signaling, and recovery semantics. Defaults are scaffold values to
-  be replaced with published provider limits.
-headers:
-  limit: X-RateLimit-Limit
-  remaining: X-RateLimit-Remaining
-  reset: X-RateLimit-Reset
-  retryAfter: Retry-After
-  policy: RateLimit-Policy
+description: Rate limit artifact for the John Deere developer surface. The provider does not
+  publish per-second / per-minute throttle values; partner applications are subject to limits
+  set by John Deere at provisioning time and adjusted via the developer-program contact channel.
+sources:
+  - https://developer.deere.com/
 responseCodes:
   throttled: 429
-  quotaExceeded: 429
   serviceUnavailable: 503
 limits:
-  - tier: free
-    name: Free Tier Default
-    scope: api-key
-    metric: requests_per_minute
-    limit: 10
-    burst: 20
-    timeFrame: minute
-    applies:
-      - John Deere API
-  - tier: free
-    name: Free Tier Monthly Quota
-    scope: api-key
-    metric: requests_per_month
-    limit: 1000
-    timeFrame: month
-    applies:
-      - John Deere API
-  - tier: professional
-    name: Professional Tier Default
-    scope: api-key
-    metric: requests_per_minute
-    limit: 100
-    burst: 200
-    timeFrame: minute
-    applies:
-      - John Deere API
-  - tier: professional
-    name: Professional Tier Monthly Quota
-    scope: api-key
-    metric: requests_per_month
-    limit: 100000
-    timeFrame: month
-    applies:
-      - John Deere API
-  - tier: enterprise
-    name: Enterprise Negotiated Limit
-    scope: contract
-    metric: requests_per_minute
-    limit: 1000
-    burst: 5000
-    timeFrame: minute
-    applies:
-      - John Deere API
+  - name: Per-application throttle (John Deere Developer Program)
+    scope: application
+    metric: varies
+    limit: see John Deere Developer Program onboarding documentation
 policies:
   - name: Backoff Strategy
-    description: Clients should implement exponential backoff with jitter, honoring the Retry-After header
-      when present.
-  - name: Burst Handling
-    description: Short bursts above the steady-state limit are tolerated up to the documented burst ceiling
-      before throttling engages.
-  - name: Quota Reset
-    description: Monthly quotas reset at the start of each calendar month in UTC. Per-minute and per-second
-      windows reset on a sliding-window basis.
-  - name: Fair Use
-    description: Even on uncapped enterprise tiers, sustained usage that materially impacts shared infrastructure
-      may be subject to fair-use throttling.
+    description: Clients should implement exponential backoff with jitter on 429 / 503 responses
+      and honor the Retry-After header when present.
+  - name: Partner-Provisioned Limits
+    description: Steady-state and burst limits are configured per partner application by John
+      Deere; raises are requested through the developer-program contact channel.
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
