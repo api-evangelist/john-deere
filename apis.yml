@@ -48,6 +48,10 @@ apis:
       - type: Portal
         url: https://developer.deere.com/
 common:
+  - type: GitHubOrganization
+    url: https://github.com/JohnDeere
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/john-deere
   - type: Website
     url: https://developer.deere.com/
   - type: Portal
