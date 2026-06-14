@@ -1,0 +1,868 @@
+# John Deere GraphQL Schema
+# Conceptual schema based on the John Deere precision agriculture and equipment API
+# API Portal: https://developer.deere.com/
+# GitHub: https://github.com/JohnDeere
+
+# ─── Enumerations ───────────────────────────────────────────────────────────────
+
+enum MachineStatus {
+  ACTIVE
+  IDLE
+  OFF
+  FAULT
+  MAINTENANCE
+  UNKNOWN
+}
+
+enum OperationType {
+  PLANTING
+  SPRAYING
+  HARVESTING
+  TILLAGE
+  FERTILIZING
+  IRRIGATION
+  SCOUTING
+  OTHER
+}
+
+enum CropType {
+  CORN
+  SOYBEANS
+  WHEAT
+  COTTON
+  SORGHUM
+  SUNFLOWER
+  CANOLA
+  RICE
+  OTHER
+}
+
+enum FaultSeverity {
+  INFO
+  WARNING
+  CRITICAL
+  STOP
+}
+
+enum PrescriptionType {
+  SEEDING
+  APPLICATION
+  IRRIGATION
+  FERTILIZER
+}
+
+enum SoilTextureClass {
+  SAND
+  LOAMY_SAND
+  SANDY_LOAM
+  LOAM
+  SILT_LOAM
+  SILT
+  SANDY_CLAY_LOAM
+  CLAY_LOAM
+  SILTY_CLAY_LOAM
+  SANDY_CLAY
+  SILTY_CLAY
+  CLAY
+}
+
+enum WeatherCondition {
+  CLEAR
+  PARTLY_CLOUDY
+  CLOUDY
+  RAIN
+  HEAVY_RAIN
+  THUNDERSTORM
+  SNOW
+  FOG
+  WIND
+}
+
+enum IrrigationMethod {
+  DRIP
+  SPRINKLER
+  PIVOT
+  FLOOD
+  SUBSURFACE
+}
+
+enum ImagerySource {
+  SENTINEL_2
+  LANDSAT
+  PLANET
+  MAXAR
+  DEERE_AERIAL
+}
+
+# ─── Geometry ───────────────────────────────────────────────────────────────────
+
+type GeoPoint {
+  latitude: Float!
+  longitude: Float!
+  altitude: Float
+}
+
+type GeoPolygon {
+  rings: [[GeoPoint!]!]!
+  area: Float
+  areaUnit: String
+}
+
+type Boundary {
+  id: ID!
+  name: String
+  polygon: GeoPolygon
+  area: Float
+  areaUnit: String
+}
+
+# ─── Organization and Auth ──────────────────────────────────────────────────────
+
+type Organization {
+  id: ID!
+  name: String!
+  type: String
+  member: Boolean
+  admin: Boolean
+  links: [Link!]
+  fields: [Field!]
+  fleet: Fleet
+  machines: [Machine!]
+}
+
+type APIClient {
+  clientId: ID!
+  name: String!
+  scopes: [String!]
+  redirectUris: [String!]
+  created: String
+  modified: String
+}
+
+type OAuthToken {
+  accessToken: String!
+  tokenType: String!
+  expiresIn: Int
+  refreshToken: String
+  scope: String
+  issuedAt: String
+}
+
+type Link {
+  rel: String!
+  uri: String!
+  type: String
+}
+
+# ─── Equipment and Fleet ─────────────────────────────────────────────────────────
+
+type Machine {
+  id: ID!
+  name: String!
+  serialNumber: String
+  modelYear: Int
+  equipmentMake: String
+  equipmentModel: String
+  equipmentType: String
+  status: MachineStatus
+  location: MachineLocation
+  engineHours: EngineHours
+  fuelUsage: FuelUsage
+  info: MachineInfo
+  telematicsState: String
+  subscriptionStatus: String
+  alerts: [MachineAlert!]
+  faultCodes: [FaultCode!]
+  serviceRecords: [ServiceRecord!]
+  links: [Link!]
+}
+
+type MachineInfo {
+  id: ID!
+  machineId: ID!
+  modelYear: Int
+  equipmentMake: String
+  equipmentModel: String
+  equipmentType: String
+  serialNumber: String
+  enginePower: Float
+  enginePowerUnit: String
+  maxSpeed: Float
+  maxSpeedUnit: String
+}
+
+type Equipment {
+  id: ID!
+  name: String!
+  category: String
+  make: String
+  model: String
+  serialNumber: String
+  year: Int
+  attachedTo: Machine
+  details: EquipmentDetails
+}
+
+type EquipmentDetails {
+  id: ID!
+  equipmentId: ID!
+  width: Float
+  widthUnit: String
+  sections: Int
+  capacity: Float
+  capacityUnit: String
+  lastCalibrated: String
+}
+
+type EquipmentSync {
+  id: ID!
+  machineId: ID!
+  syncedAt: String!
+  syncStatus: String
+  recordCount: Int
+  errors: [String!]
+}
+
+type Fleet {
+  id: ID!
+  organizationId: ID!
+  machines: [Machine!]!
+  totalMachines: Int!
+  activeMachines: Int
+  machinesWithAlerts: Int
+}
+
+type MachineLocation {
+  machineId: ID!
+  latitude: Float!
+  longitude: Float!
+  altitude: Float
+  heading: Float
+  speed: Float
+  speedUnit: String
+  timestamp: String!
+  accuracy: Float
+}
+
+type EngineHours {
+  machineId: ID!
+  totalHours: Float!
+  idleHours: Float
+  loadedHours: Float
+  asOf: String
+}
+
+type FuelUsage {
+  machineId: ID!
+  totalFuel: Float
+  fuelUnit: String
+  averageFuelRate: Float
+  fuelRateUnit: String
+  period: String
+  asOf: String
+}
+
+type OperatingHour {
+  id: ID!
+  machineId: ID!
+  date: String!
+  hours: Float!
+  idleHours: Float
+  loadedHours: Float
+  fuelConsumed: Float
+  fuelUnit: String
+}
+
+type MachineAlert {
+  id: ID!
+  machineId: ID!
+  alertType: String!
+  severity: FaultSeverity!
+  message: String!
+  createdAt: String!
+  resolvedAt: String
+  active: Boolean!
+}
+
+# ─── Telemetry and Health ────────────────────────────────────────────────────────
+
+type TelematicsRecord {
+  id: ID!
+  machineId: ID!
+  timestamp: String!
+  latitude: Float
+  longitude: Float
+  speed: Float
+  speedUnit: String
+  engineRpm: Float
+  engineLoad: Float
+  fuelLevel: Float
+  coolantTemperature: Float
+  hydraulicOilTemperature: Float
+  heading: Float
+  elevation: Float
+}
+
+type EngineHealth {
+  machineId: ID!
+  overallScore: Float
+  coolantTemperature: Float
+  oilPressure: Float
+  airFilterStatus: String
+  fuelFilterStatus: String
+  batteryVoltage: Float
+  alternatorOutput: Float
+  lastChecked: String
+}
+
+type FaultCode {
+  id: ID!
+  machineId: ID!
+  code: String!
+  description: String
+  severity: FaultSeverity!
+  spn: Int
+  fmi: Int
+  occurrenceCount: Int
+  firstOccurred: String
+  lastOccurred: String
+  active: Boolean!
+}
+
+type MaintenanceAlert {
+  id: ID!
+  machineId: ID!
+  alertType: String!
+  component: String!
+  description: String
+  dueDate: String
+  dueHours: Float
+  currentHours: Float
+  priority: String
+  acknowledged: Boolean!
+}
+
+type ServiceRecord {
+  id: ID!
+  machineId: ID!
+  serviceType: String!
+  performedAt: String!
+  performedBy: String
+  hoursAtService: Float
+  notes: String
+  partsReplaced: [String!]
+  nextServiceDue: String
+  nextServiceHours: Float
+}
+
+# ─── Field and Agronomic Geography ──────────────────────────────────────────────
+
+type Field {
+  id: ID!
+  name: String!
+  organizationId: ID!
+  area: Float
+  areaUnit: String
+  boundary: FieldBoundary
+  cropZones: [CropZone!]
+  managementZones: [ManagementZone!]
+  operations: [FieldOperation!]
+  weather: FieldWeather
+  soilData: [SoilData!]
+  satelliteImagery: [SatelliteImagery!]
+  irrigation: Irrigation
+  links: [Link!]
+}
+
+type FieldBoundary {
+  id: ID!
+  fieldId: ID!
+  polygon: GeoPolygon!
+  area: Float
+  areaUnit: String
+  source: String
+  verified: Boolean
+}
+
+type CropZone {
+  id: ID!
+  fieldId: ID!
+  name: String!
+  crop: CropType
+  variety: String
+  season: String
+  area: Float
+  areaUnit: String
+  boundary: Boundary
+  plantingDate: String
+  harvestDate: String
+  expectedYield: Float
+  yieldUnit: String
+}
+
+type ManagementZone {
+  id: ID!
+  fieldId: ID!
+  name: String!
+  zoneNumber: Int
+  area: Float
+  areaUnit: String
+  boundary: Boundary
+  attributes: [ZoneAttribute!]
+}
+
+type ZoneAttribute {
+  name: String!
+  value: String!
+  unit: String
+}
+
+# ─── Field Operations ────────────────────────────────────────────────────────────
+
+type FieldOperation {
+  id: ID!
+  fieldId: ID!
+  machineId: ID
+  operationType: OperationType!
+  startTime: String!
+  endTime: String
+  area: Float
+  areaUnit: String
+  totalDistance: Float
+  distanceUnit: String
+  crop: CropType
+  season: String
+  activity: FieldActivity
+  plantingData: PlantingData
+  sprayingData: SprayingData
+  harvesterData: HarvesterData
+  tillageData: TillageData
+  asAppliedMap: AsAppliedMap
+}
+
+type FieldActivity {
+  id: ID!
+  operationId: ID!
+  activityType: String!
+  startTime: String!
+  endTime: String
+  machineId: ID
+  operatorId: String
+  notes: String
+}
+
+type PlantingData {
+  operationId: ID!
+  crop: CropType!
+  variety: String
+  seedRate: Float
+  seedRateUnit: String
+  rowSpacing: Float
+  rowSpacingUnit: String
+  seedingDepth: Float
+  seedingDepthUnit: String
+  population: Float
+  populationUnit: String
+  prescription: SeedingPrescription
+}
+
+type SprayingData {
+  operationId: ID!
+  product: String
+  activeIngredient: String
+  applicationRate: Float
+  applicationRateUnit: String
+  tankMixConcentration: Float
+  totalProductApplied: Float
+  productUnit: String
+  pressure: Float
+  pressureUnit: String
+  nozzleType: String
+  prescription: ApplicationPrescription
+}
+
+type HarvesterData {
+  operationId: ID!
+  crop: CropType!
+  variety: String
+  moisture: Float
+  testWeight: Float
+  testWeightUnit: String
+  yield: Float
+  yieldUnit: String
+  totalHarvested: Float
+  totalHarvestedUnit: String
+  yieldMap: YieldMap
+}
+
+type TillageData {
+  operationId: ID!
+  tillageType: String
+  implementWidth: Float
+  implementWidthUnit: String
+  depth: Float
+  depthUnit: String
+  speed: Float
+  speedUnit: String
+  soilCondition: String
+}
+
+# ─── Precision Agriculture ───────────────────────────────────────────────────────
+
+type PrecisionAg {
+  fieldId: ID!
+  season: String
+  prescriptions: [Prescription!]
+  soilSamplingZones: [ManagementZone!]
+  yieldHistory: [YieldData!]
+  asAppliedHistory: [AsAppliedMap!]
+  prescriptionMaps: [PrescriptionMap!]
+  satelliteImagery: [SatelliteImagery!]
+}
+
+type Prescription {
+  id: ID!
+  fieldId: ID!
+  name: String!
+  prescriptionType: PrescriptionType!
+  crop: CropType
+  season: String
+  created: String
+  modified: String
+  totalArea: Float
+  areaUnit: String
+  seedingPrescription: SeedingPrescription
+  applicationPrescription: ApplicationPrescription
+}
+
+type SeedingPrescription {
+  prescriptionId: ID!
+  crop: CropType!
+  varieties: [Variety!]
+  zones: [PrescriptionZone!]
+  averageRate: Float
+  rateUnit: String
+  totalSeedQuantity: Float
+  seedQuantityUnit: String
+}
+
+type ApplicationPrescription {
+  prescriptionId: ID!
+  product: String!
+  activeIngredient: String
+  zones: [PrescriptionZone!]
+  averageRate: Float
+  rateUnit: String
+  totalProduct: Float
+  productUnit: String
+}
+
+type PrescriptionZone {
+  zoneId: ID!
+  boundary: Boundary
+  rate: Float!
+  rateUnit: String!
+  variety: String
+  notes: String
+}
+
+type PrescriptionMap {
+  id: ID!
+  fieldId: ID!
+  prescriptionId: ID!
+  name: String!
+  created: String
+  season: String
+  imageUrl: String
+  vectorUrl: String
+  minRate: Float
+  maxRate: Float
+  avgRate: Float
+  rateUnit: String
+}
+
+type Variety {
+  id: ID!
+  name: String!
+  crop: CropType!
+  brand: String
+  traitsDescription: String
+  relativeMaturity: Float
+  yieldPotential: String
+  droughtTolerance: String
+  diseasePackage: String
+}
+
+type Seed {
+  id: ID!
+  varietyId: ID!
+  lotNumber: String
+  treatmentCode: String
+  germination: Float
+  purity: Float
+  seedsPerUnit: Int
+  unitWeight: Float
+  unitWeightUnit: String
+}
+
+# ─── Soil and Yield ──────────────────────────────────────────────────────────────
+
+type SoilData {
+  id: ID!
+  fieldId: ID!
+  sampleDate: String!
+  depth: Float
+  depthUnit: String
+  location: GeoPoint
+  ph: Float
+  organicMatter: Float
+  cec: Float
+  nitrogen: Float
+  phosphorus: Float
+  potassium: Float
+  sulfur: Float
+  texture: SoilTextureClass
+  bulkDensity: Float
+  moistureContent: Float
+  lab: String
+}
+
+type YieldData {
+  id: ID!
+  fieldId: ID!
+  season: String!
+  crop: CropType!
+  variety: String
+  harvestDate: String
+  averageYield: Float!
+  yieldUnit: String!
+  totalProduction: Float
+  productionUnit: String
+  area: Float
+  areaUnit: String
+  moisture: Float
+  yieldMap: YieldMap
+}
+
+type YieldMap {
+  id: ID!
+  fieldId: ID!
+  season: String
+  crop: CropType
+  created: String
+  imageUrl: String
+  vectorUrl: String
+  minYield: Float
+  maxYield: Float
+  avgYield: Float
+  yieldUnit: String
+  resolution: Float
+  resolutionUnit: String
+}
+
+type AsAppliedMap {
+  id: ID!
+  operationId: ID!
+  fieldId: ID!
+  operationType: OperationType!
+  created: String
+  imageUrl: String
+  vectorUrl: String
+  minRate: Float
+  maxRate: Float
+  avgRate: Float
+  rateUnit: String
+  coverage: Float
+  coverageUnit: String
+}
+
+type SoilMoisture {
+  id: ID!
+  fieldId: ID!
+  sensorId: String
+  location: GeoPoint
+  timestamp: String!
+  depth: Float
+  depthUnit: String
+  volumetricWaterContent: Float
+  saturation: Float
+  fieldCapacity: Float
+  wiltingPoint: Float
+  availableWater: Float
+}
+
+# ─── Imagery and Weather ─────────────────────────────────────────────────────────
+
+type SatelliteImagery {
+  id: ID!
+  fieldId: ID!
+  source: ImagerySource!
+  captureDate: String!
+  cloudCover: Float
+  resolution: Float
+  resolutionUnit: String
+  ndvi: Float
+  ndre: Float
+  msavi: Float
+  thumbnailUrl: String
+  imageUrl: String
+  bands: [ImageryBand!]
+}
+
+type ImageryBand {
+  name: String!
+  wavelength: Float
+  wavelengthUnit: String
+  min: Float
+  max: Float
+  mean: Float
+}
+
+type WeatherData {
+  stationId: ID!
+  location: GeoPoint
+  timestamp: String!
+  condition: WeatherCondition
+  temperatureC: Float
+  temperatureF: Float
+  humidity: Float
+  dewPointC: Float
+  precipitationMm: Float
+  windSpeedKph: Float
+  windDirectionDeg: Float
+  solarRadiation: Float
+  evapotranspiration: Float
+  pressure: Float
+}
+
+type FieldWeather {
+  fieldId: ID!
+  current: WeatherData
+  forecast: [WeatherData!]
+  historical: [WeatherData!]
+  growingDegreeDays: Float
+  cumulativePrecipitation: Float
+  frostRisk: Boolean
+}
+
+# ─── Irrigation ──────────────────────────────────────────────────────────────────
+
+type Irrigation {
+  id: ID!
+  fieldId: ID!
+  method: IrrigationMethod
+  zones: [IrrigationZone!]
+  totalWaterApplied: Float
+  waterUnit: String
+  lastIrrigated: String
+  nextScheduled: String
+}
+
+type IrrigationZone {
+  id: ID!
+  irrigationId: ID!
+  name: String!
+  area: Float
+  areaUnit: String
+  boundary: Boundary
+  flowRate: Float
+  flowRateUnit: String
+  waterApplied: Float
+  waterUnit: String
+  soilMoisture: SoilMoisture
+  schedule: IrrigationSchedule
+}
+
+type IrrigationSchedule {
+  zoneId: ID!
+  startTime: String
+  duration: Int
+  durationUnit: String
+  frequency: String
+  targetMoisture: Float
+}
+
+# ─── Query Root ──────────────────────────────────────────────────────────────────
+
+type Query {
+  # Organization
+  organization(id: ID!): Organization
+  organizations: [Organization!]
+
+  # Machines and Fleet
+  machine(id: ID!): Machine
+  machines(organizationId: ID!): [Machine!]
+  fleet(organizationId: ID!): Fleet
+  machineLocation(machineId: ID!): MachineLocation
+  machineEngineHours(machineId: ID!): EngineHours
+  machineFuelUsage(machineId: ID!, period: String): FuelUsage
+  machineTelemetry(machineId: ID!, startTime: String, endTime: String): [TelematicsRecord!]
+  machineAlerts(machineId: ID!, active: Boolean): [MachineAlert!]
+  engineHealth(machineId: ID!): EngineHealth
+  faultCodes(machineId: ID!, active: Boolean): [FaultCode!]
+  maintenanceAlerts(machineId: ID!): [MaintenanceAlert!]
+  serviceRecords(machineId: ID!): [ServiceRecord!]
+  operatingHours(machineId: ID!, startDate: String, endDate: String): [OperatingHour!]
+
+  # Equipment
+  equipment(id: ID!): Equipment
+  equipmentForMachine(machineId: ID!): [Equipment!]
+
+  # Fields
+  field(id: ID!): Field
+  fields(organizationId: ID!): [Field!]
+  fieldBoundary(fieldId: ID!): FieldBoundary
+  cropZones(fieldId: ID!): [CropZone!]
+  managementZones(fieldId: ID!): [ManagementZone!]
+
+  # Field Operations
+  fieldOperation(id: ID!): FieldOperation
+  fieldOperations(fieldId: ID!, operationType: OperationType, season: String): [FieldOperation!]
+
+  # Precision Ag
+  prescription(id: ID!): Prescription
+  prescriptions(fieldId: ID!): [Prescription!]
+  prescriptionMap(id: ID!): PrescriptionMap
+  yieldData(fieldId: ID!, season: String): [YieldData!]
+  yieldMap(id: ID!): YieldMap
+  asAppliedMap(id: ID!): AsAppliedMap
+  asAppliedMaps(fieldId: ID!, season: String): [AsAppliedMap!]
+  precisionAg(fieldId: ID!, season: String): PrecisionAg
+
+  # Soil and Moisture
+  soilData(fieldId: ID!): [SoilData!]
+  soilMoisture(fieldId: ID!, sensorId: String): [SoilMoisture!]
+
+  # Imagery and Weather
+  satelliteImagery(fieldId: ID!, startDate: String, endDate: String): [SatelliteImagery!]
+  fieldWeather(fieldId: ID!): FieldWeather
+
+  # Irrigation
+  irrigation(fieldId: ID!): Irrigation
+
+  # Seeds and Varieties
+  variety(id: ID!): Variety
+  varieties(crop: CropType, brand: String): [Variety!]
+  seed(id: ID!): Seed
+}
+
+# ─── Mutation Root ───────────────────────────────────────────────────────────────
+
+type Mutation {
+  # Field management
+  createField(organizationId: ID!, name: String!, boundary: ID): Field
+  updateField(id: ID!, name: String): Field
+  deleteField(id: ID!): Boolean
+
+  # Prescription management
+  createPrescription(fieldId: ID!, name: String!, prescriptionType: PrescriptionType!, crop: CropType): Prescription
+  updatePrescription(id: ID!, name: String): Prescription
+  deletePrescription(id: ID!): Boolean
+
+  # Maintenance
+  acknowledgeMaintenanceAlert(id: ID!): MaintenanceAlert
+  createServiceRecord(machineId: ID!, serviceType: String!, performedAt: String!, notes: String): ServiceRecord
+
+  # Irrigation scheduling
+  updateIrrigationSchedule(zoneId: ID!, startTime: String, duration: Int, targetMoisture: Float): IrrigationSchedule
+}
