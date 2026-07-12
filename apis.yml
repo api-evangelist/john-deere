@@ -46,6 +46,8 @@ apis:
   - url: graphql/john-deere-graphql.md
     type: GraphQL
 common:
+- type: DomainSecurity
+  url: security/john-deere-domain-security.yml
 - type: GitHubOrganization
   url: https://github.com/JohnDeere
 - type: LinkedIn
