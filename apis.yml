@@ -6,6 +6,17 @@ description: John Deere is a renowned American corporation that specializes in m
   John Deere's products include tractors, combines, excavators, and other equipment
   designed to support and improve farming and construction operations.
 type: Index
+deliveryModel:
+  model: unknown
+  open_source: false
+  commercial: false
+  callable_host: false
+  label: Delivery model not determined — needs a product licence on record
+  confidence: low
+  source:
+  - none
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: free
   onboarding: unknown
