@@ -58,8 +58,6 @@ apis:
     url: https://developer.deere.com/
   - type: Portal
     url: https://developer.deere.com/
-  - url: graphql/john-deere-graphql.md
-    type: GraphQL
 - aid: john-deere:operations-center-organizations-api
   name: John Deere Operations Center Organizations API
   description: Provides access to the organizations a John Deere Operations Center user belongs to. Organizations are the top-level container for users, fields, equipment, and partner relationships in Operations Center.
