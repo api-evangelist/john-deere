@@ -1,0 +1,81 @@
+edges:
+- partner_name: AgGateway (ADAPT / AgGateway standards)
+  partner: null
+  partner_match: register
+  type: register
+  direction: partner-built
+  evidence: https://aggateway.org/AboutUs/Members.aspx
+  category: farm data standards
+  channel: standard-directory
+  relationship: standard-participant
+  contract_reference:
+    register: AgGateway member list (aggateway.org/AboutUs/Members.aspx)
+    spec_file: null
+    standard: AgGateway (ADAPT, ISOXML/SPADE/PAIL, CIDX)
+    role: aggateway-member
+    registered_name: John Deere
+    website: https://www.deere.com/en/agriculture/
+    matched_domain: deere.com
+    matched_by: domain
+    signal_note: 'participation only: membership is not conformance'
+    detected_by: sweep-agriculture-food.py
+    detected: '2026-10-15'
+  detected_by: sweep-agriculture-food.py
+  first_seen: '2026-10-15'
+- partner_name: agrirouter (DKE-Data)
+  partner: null
+  partner_match: register
+  type: register
+  direction: partner-built
+  evidence: https://agrirouter.com/en/solutions/john-deere-operations-center
+  category: farm data exchange
+  channel: standard-directory
+  relationship: standard-participant
+  contract_reference:
+    register: agrirouter Solution Finder (agrirouter.com/en/solutions)
+    spec_file: null
+    standard: agrirouter (ISO 11783-10 TaskData, shape, telemetry)
+    role: agrirouter-ready-solution
+    registered_name: John Deere
+    website: https://www.deere.com/
+    matched_domain: deere.com
+    matched_by: domain
+    solutions:
+    - category: agriculture-software
+      solutions:
+      - john-deere-operations-center
+      sends:
+      - shape
+      receives:
+      - taskdata-other
+      - taskdata-work-order
+      - taskdata-work-record
+    signal_note: 'participation only: solutions are context, one entry per category; never a count'
+    detected_by: sweep-agriculture-food.py
+    detected: '2026-10-15'
+  detected_by: sweep-agriculture-food.py
+  first_seen: '2026-10-15'
+- partner_name: Climate FieldView (connected partners)
+  partner: climate-fieldview
+  partner_match: mirror
+  mirror_match: domain
+  type: marketplace
+  relationship: platform-app
+  direction: third-party
+  channel: partner-built
+  marketplace: own
+  evidence: https://climate.com/en-us/partners/john-deere-operations-center.html
+  mirror_of: climate-fieldview/integrations/climate-fieldview-integration-edges.yml
+  apps:
+  - John Deere Operations Center
+  detected: '2026-10-15'
+  detected_by: sweep-agriculture-food.py
+generated: '2026-10-15'
+method: searched
+source:
+- https://aggateway.org/AboutUs/Members.aspx
+- https://agrirouter.com/en/solutions
+checked:
+- https://aggateway.org/AboutUs/Members.aspx
+- https://agrirouter.com/en/solutions
+- https://climate.com/en-us/partners.html
